@@ -15,83 +15,68 @@ Certains projets sont encore en construction : l'architecture décrite est alors
 
 ## :lucide-clapperboard: &nbsp; App Cinéma
 
-**Projet personnel — base cinéma enrichie et recommandations personnelles**
+**Projet personnel — en construction**
 
-Construire et explorer une base cinéma issue d'IMDb, enrichie par des prescriptions cinéphiles (critiques, cinéastes, revues, institutions, festivals) et des mesures d'audience, puis pondérer ces signaux selon des profils personnels pour produire des recommandations. Un projet à la croisée de ma pratique du cinéma et de la donnée.
+À destination des cinéphiles, ce projet construit une **base cinéma personnelle** à partir d'IMDb, enrichie de signaux de prescription — sélections de cinéastes, critiques, festivals, institutions, revues — pour explorer les films et les cinéastes, puis à terme produire des **recommandations personnelles** à partir d'une liste de films préférés. Le projet n'est pas terminé : ni démo publiée, ni dépôt public pour le moment, mais une interface Streamlit de consultation existe déjà en local.
 
-### Architecture cible
+**Parcours utilisateur (cible)**
+
+- Mettre à jour les référentiels IMDb et importer un nouveau signal cinéphile
+- Valider les correspondances ambiguës en zone de staging
+- Explorer une filmographie, un cinéaste, un pays, une période ou un signal
+- Comparer critiques et public, mesurer la couverture de la base
+- Créer des profils cinéphiles et pondérer les signaux selon ses affinités
+- Obtenir des recommandations à partir d'une liste de films préférés *(à venir)*
+
+
+<details markdown>
+<summary><strong>Architecture cible</strong></summary>
+
+Côté données, le projet sépare les **référentiels bruts** (`ref_*` : œuvres, personnes, contributeurs, notes IMDb, territoires), les **zones de staging** (`stg_*`) relues manuellement et le **cœur métier** consolidé. Tous les signaux partagent le même modèle, quel que soit leur émetteur : un **agent** (cinéaste, critique, revue, institution, festival, audience) applique une **valeur** — sélection classée ou non, distinction, note, mesure — à des films ou à des cinéastes, avec son périmètre (période, pays, genre, durée). L'intégration est semi-automatique : collecte, normalisation, résolution en cascade des titres et des noms, puis revue manuelle des cas ambigus avant chargement dans le cœur métier.
+
+Côté technique, l'entrepôt est un **DuckDB** local organisé en miroir du code (`ref_*` / `stg_*` / cœur), avec des schémas de garde-frontière Pydantic et `pandera`, des recettes `just` par domaine et une interface **Streamlit** de consultation déjà amorcée (filmographies, cinéastes par pays, critiques face au public, couverture, correspondances à relire). La cible est de basculer la base sur **MotherDuck** afin de publier l'application sur un entrepôt cloud, sans changer le modèle de données.
+
+La dernière brique reste à construire : le volet apprentissage. D'abord un **clustering** des signaux pour dégager des *familles de cinéastes* (affinités, coréalisations, proximités de goût), puis un moteur de **recommandation** qui, à partir d'une liste de films préférés, pondère les signaux selon le profil pour proposer des films.
+
+Pour plus de détails, consultez la documentation technique du projet (locale pour l'instant : processus de référence, de signaux et d'enrichissement, modèle des signaux, dictionnaire des tables).
+
 
 ```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontSize": "16px"
+  },
+  "themeCSS": ".node rect, .node polygon, .node path, .node circle, .node ellipse { fill: var(--ctp-base); stroke: var(--ctp-surface1); stroke-width: 1.5px; }\n.nodeLabel { color: var(--ctp-text); fill: var(--ctp-text); }\n.cluster rect { fill: var(--ctp-mantle); stroke: var(--ctp-surface1); stroke-width: 1px; rx: 10px; ry: 10px; }\n.cluster-label, .cluster .nodeLabel, .cluster span, .cluster text { color: var(--ctp-text); fill: var(--ctp-subtext0); }\n.edgePath .path, .flowchart-link { stroke: var(--ctp-overlay1); stroke-width: 1.5px; }\n.marker, .arrowheadPath { fill: var(--ctp-overlay1); stroke: var(--ctp-overlay1); }\n.edgeLabel { background-color: transparent !important; color: var(--ctp-text) !important; }\n.labelBkg, .edgeLabel .labelBkg, .edgeLabel .label rect, .edgeLabel rect { background-color: var(--ctp-mantle) !important; fill: var(--ctp-mantle) !important; }\n.edgeLabel .label, .edgeLabel span, .edgeLabel text, .edgeLabel p { background-color: var(--ctp-mantle) !important; color: var(--ctp-text) !important; fill: var(--ctp-text) !important; }",
+  "flowchart": {
+    "nodeSpacing": 40,
+    "rankSpacing": 50,
+    "htmlLabels": true,
+    "padding": 15,
+    "curve": "basis",
+    "subGraphTitleMargin": {"top": 20, "bottom": 20}
+  }
+}}%%
 flowchart LR
-    subgraph SRC["Sources"]
+    subgraph CONC["<b>Conception · Données & signaux</b>"]
         direction TB
-        IMDB["IMDb (TSV bruts)"]
-        WEB["Festivals, revues,<br/>critiques (web, PDF, images)"]
-        WIKI["Wikidata (SPARQL)"]
-        BOX["Box-office France"]
+        A(("<b>Sources</b><br/>IMDb · Wikidata<br/>signaux cinéphiles")) --> B("<b>Ingestion & matching</b><br/>normalisation · résolution en cascade<br/>revue manuelle des cas ambigus<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pandera-2C5F8A?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        B --> C("<b>Entrepôt DuckDB</b><br/>ref_* · stg_* · cœur métier<br/>agents · signaux · films · cinéastes · profils<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/DuckDB-FFF000?style=for-the-badge&logo=duckdb&logoColor=black' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        C --> D("<b>Consultation</b><br/>filmographies · pays · critiques vs public<br/>couverture de la base<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
     end
 
-    subgraph LOCAL["Pipelines locaux"]
+    subgraph DEPL["<b>Cible · Application & modèles</b>"]
         direction TB
-        ING["collect → stage → match → load<br/>revue manuelle des correspondances"]
-        LLMDATA["Extraction assistée<br/>par LLM"]
-        DUCK[("DuckDB local<br/>ref_* / stg_* / cœur métier")]
+        E("<b>Base cloud</b><br/>entrepôt partagé, même modèle de données<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MotherDuck-1B1B1B?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        E --> F("<b>Application Streamlit</b><br/>exploration · profils · pondérations<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        F -.->|à venir| G("<b>Familles de cinéastes</b><br/>clustering des signaux · affinités et coréalisations<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        F -.->|à venir| H("<b>Recommandations</b><br/>liste de films préférés · pondération par profil<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
     end
 
-    DBT["dbt<br/>modèles, tests, lineage"]
-    DAG["Dagster<br/>orchestration, lineage"]
-    MD[("MotherDuck<br/>warehouse cloud")]
-    APP["App Streamlit Cloud<br/>consultation, profils, recommandations"]
-
-    IMDB --> ING
-    WEB --> ING
-    WIKI --> ING
-    BOX --> ING
-    LLMDATA --> ING
-    ING --> DUCK
-    DUCK --> DBT
-    DBT --> MD
-    MD --> APP
-    DAG -.-> ING
-    DAG -.-> DBT
+    CONC ==>|bascule de la base| DEPL
 ```
 
-Trois processus semi-automatisés structurent le remplissage : **référence** (import IMDb et calcul des colonnes de recherche), **signaux** (collecte d'un signal puis appariement en cascade aux films et cinéastes) et **enrichissement** (métadonnées des cinéastes via Wikidata). Chaque étape de correspondance passe par une zone de staging relue manuellement avant intégration au cœur métier.
-
-### Stack
-
-| Domaine | Brique | Rôle |
-| :--- | :--- | :--- |
-| Data & Analytics | IMDb datasets, `DuckDB` | Référentiels bruts (`ref_*`) puis entrepôt local (≈1,9 Go, 78 M lignes de contributeurs) |
-| Data & Analytics | `Selenium`, `Playwright`, `BeautifulSoup` | Collecte des palmarès, sélections et classements de critiques |
-| Data & Analytics | `PyMuPDF`, `pdfplumber`, `img2table`, `pytesseract` / `ocrmac`, `OpenCV` | Extraction des revues et documents scannés (OCR, tableaux) |
-| Data & Analytics | SPARQL Wikidata, `mwparserfromhell` | Enrichissement des cinéastes : nationalités, genres, identifiants |
-| Data & Analytics | `pandas`, `Polars`, `PyArrow` | Préparation, contrôles de volumétrie, exports |
-| Data & Analytics | `pandera`, `Pydantic` | Garde-frontière des tables de staging (schémas de validation) |
-| Data & Analytics | **dbt** | Modélisation en couches (`ref` / `stg` / cœur), tests et lineage |
-| Data & Analytics | **Dagster** | Orchestration, planification et traçabilité des pipelines |
-| Data & Analytics | **MotherDuck** | Warehouse cloud partagé, base de l'application publiée |
-| Machine Learning | Cascades de matching (`MATCH_NAME`, `MATCH_TITLE`) et normalisation de texte | Appariement agents / œuvres / cinéastes avec revue des cas ambigus |
-| Machine Learning | `scikit-learn`, `scipy` | Similarités films et cinéastes, familles de films |
-| LLM & GenAI | `google-genai` (Gemini 2.5 Flash) | Contrôle assisté des grilles de notes extraites de documents scannés |
-| Interfaces | `Streamlit`, `Altair`, `Plotly` | Application de consultation (filmographies, pays, couverture, matching, analyses) |
-| Industrialisation | `uv`, `just`, `ruff`, `ty`, `pytest`, pre-commit, Commitizen | Outillage de développement et de qualité |
-| Industrialisation | GitHub Actions, Docker, Zensical | CI, conteneurisation, documentation technique |
-
-### Roadmap
-
-| Phase | Contenu |
-| :--- | :--- |
-| **MVP** | Référentiels, enrichissement, ingestion, matching, sauvegardes et consultation |
-| **Évolution** | Profils cinéphiles, pondérations et exploration avancée |
-| **Dernière brique** | Recommandations automatiques basées sur les profils |
-| **Cible technique** | Passage à un warehouse cloud (MotherDuck) et publication de l'app (Streamlit Cloud) |
-
-### Liens
-
-- **Démo** : *à venir* (app Streamlit Cloud, dépôt public à publier)
-- **Code** : *à venir* (dépôt local, pas encore de dépôt distant)
-- **Doc technique** : *à venir* (documentation Zensical des trois processus, construite localement)
+</details>
 
 ---
 
