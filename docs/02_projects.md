@@ -97,48 +97,75 @@ Trois processus semi-automatisés structurent le remplissage : **référence** (
 
 ## :lucide-wheat: &nbsp; App Agriculture
 
-**Projet Bootcamp MLOps — prédiction et recommandation de rendements agricoles**
+À destination des acteurs agricoles, cette application prédit le **rendement d'une culture** à partir de données climatiques et agricoles — pluviométrie, pesticides, température — issues du dataset FAO, et **classe toutes les cultures** pour un contexte donné. [**Lien vers l'application**](https://agri-ui-28873275232.europe-west1.run.app) (cold start)
 
-Prédire et recommander des rendements agricoles à partir de données climatiques et agricoles (pluviométrie, pesticides, température), depuis un dataset FAO. C'est le projet de référence côté MLOps : configuration déclarative, traçabilité complète dans MLflow, service et interface déployés en deux conteneurs indépendants.
+<div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
 
-### Architecture
+<div style="flex: 0 0 50%;">
+<img src="assets/ui_agri.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;">
+</div>
+
+<div style="flex: 1;" markdown>
+
+**Parcours utilisateur**
+
+- Choix de la zone, de la culture et de l'année
+- Réglage des conditions (pluviométrie, pesticides, température) ou reprise des conditions réellement enregistrées
+- Prédiction du rendement de la culture sélectionnée
+- Classement de toutes les cultures par score relatif, pour le même contexte
+- Onglet par usage : prédiction ou recommandation, servis par l'API
+
+</div>
+
+</div>
+
+
+<details markdown>
+<summary><strong>Architecture de la solution</strong></summary>
+
+Côté conception, le pipeline part du dataset FAO et d'un **split par année** — 1990-2012 pour l'entraînement, 2013 en holdout — pour coller au cas d'usage réel : réentraîner chaque année et prédire l'année suivante. Le feature engineering ajoute trois variables métier (interaction pluie/température, efficacité de la pluie, écart à la température optimale de la culture), `Area` et `Item` sont encodés par un `TargetEncoder` validé en 5 folds, et les schémas d'entrée, de cible et de sortie sont contrôlés par `pandera`. Le tuning (`RandomizedSearchCV`, 30 combinaisons) s'appuie sur une validation glissante « 5 ans d'entraînement / 1 an de test » déroulée sur tout l'historique (17 folds) : la dérive temporelle des rendements rend les fenêtres courtes plus pertinentes, une fenêtre de 5 ans minimisant le RMSE (20 652 ± 1 306) contre 23 826 sur 20 ans. Le modèle final (`XGBoost`, baseline `RandomForest`) est entraîné sur les 5 dernières années, signé, enregistré dans le **MLflow Model Registry** puis promu par l'alias `Champion` (meilleur `R2_test`) ; importances et valeurs `SHAP` documentent ses décisions. Dernier run : `RMSE_test` ≈ 19 653 et `R2_test` ≈ 0,959 sur le holdout 2013.
+
+Côté déploiement, deux images Docker indépendantes sont construites par la CI puis déployées sur **Google Cloud Run** (`europe-west1`, scale-to-zero) : `agri-api` embarque le modèle `Champion` (bundle exporté du registre, aucun registre MLflow au runtime) et expose `/predict` et `/recommend` avec sa [documentation Swagger](https://agri-api-28873275232.europe-west1.run.app/docs) ; `agri-ui` reste volontairement légère (Gradio seul, sans stack ML) et interroge l'API via `API_URL`. Déploiement par digest, authentification sans clé (Workload Identity Federation) et notification d'échec en fin de pipeline.
+
+Pour plus de détails, consultez la [documentation technique](https://olivierbinder.github.io/agri/) et le [code](https://github.com/olivierbinder/agri) du projet.
+
 
 ```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontSize": "16px"
+  },
+  "themeCSS": ".node rect, .node polygon, .node path, .node circle, .node ellipse { fill: var(--ctp-base); stroke: var(--ctp-surface1); stroke-width: 1.5px; }\n.nodeLabel { color: var(--ctp-text); fill: var(--ctp-text); }\n.cluster rect { fill: var(--ctp-mantle); stroke: var(--ctp-surface1); stroke-width: 1px; rx: 10px; ry: 10px; }\n.cluster-label, .cluster .nodeLabel, .cluster span, .cluster text { color: var(--ctp-text); fill: var(--ctp-subtext0); }\n.edgePath .path, .flowchart-link { stroke: var(--ctp-overlay1); stroke-width: 1.5px; }\n.marker, .arrowheadPath { fill: var(--ctp-overlay1); stroke: var(--ctp-overlay1); }\n.edgeLabel { background-color: transparent !important; color: var(--ctp-text) !important; }\n.labelBkg, .edgeLabel .labelBkg, .edgeLabel .label rect, .edgeLabel rect { background-color: var(--ctp-mantle) !important; fill: var(--ctp-mantle) !important; }\n.edgeLabel .label, .edgeLabel span, .edgeLabel text, .edgeLabel p { background-color: var(--ctp-mantle) !important; color: var(--ctp-text) !important; fill: var(--ctp-text) !important; }",
+  "flowchart": {
+    "nodeSpacing": 40,
+    "rankSpacing": 50,
+    "htmlLabels": true,
+    "padding": 15,
+    "curve": "basis",
+    "subGraphTitleMargin": {"top": 20, "bottom": 20}
+  }
+}}%%
 flowchart LR
-    DATA["Données FAO<br/>pluviométrie, pesticides, température"] --> PREP["Préparation +<br/>feature engineering"]
-    PREP --> MODEL["XGBoost tuné<br/>validation temporelle"]
-    MODEL --> MLF[("MLflow<br/>tracking + registry<br/>alias Champion")]
-    MLF --> API["agri-api (FastAPI)<br/>modèle embarqué"]
-    API --> UI["agri-ui (Gradio)"]
-    GH["GitHub Actions<br/>tests → build → deploy"] -.-> API
-    GH -.-> UI
+    subgraph CONC["<b>Conception · Data Science</b>"]
+        direction TB
+        A(("<b>Données FAO</b><br/>rendements · pluviométrie<br/>pesticides · température")) --> B("<b>Feature engineering</b><br/>3 variables métier · TargetEncoder 5 folds<br/>schémas validés par pandera<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        B --> C("<b>Entraînement & tuning</b><br/>RandomizedSearchCV · fenêtre glissante 5 ans / 1 an<br/>XGBoost vs RandomForest<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/XGBoost-006ACC?style=for-the-badge&logo=xgboost&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MLflow-0194E2?style=for-the-badge&logo=mlflow&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        C --> D("<b>Promotion & explicabilité</b><br/>alias Champion (meilleur R2) · importances et valeurs SHAP<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MLflow-0194E2?style=for-the-badge&logo=mlflow&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/SHAP-FF6F00?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+    end
+
+    subgraph DEPL["<b>Déploiement · MLOps</b>"]
+        direction TB
+        E("<b>CI/CD</b><br/>tests ≥ 80 % · build · publication<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        E --> F("<b>Images Docker Hub</b><br/>agri-api (modèle embarqué) · agri-ui (Gradio seul)<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Docker%20Hub-2496ED?style=for-the-badge&logo=docker&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        F --> G("<b>Modèle final exposé en API</b><br/>/predict · /recommend · Swagger<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        G --> H("<b>Interface utilisateur</b><br/>prédiction · classement des cultures<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Gradio-FF7C00?style=for-the-badge&logo=gradio&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Google%20Cloud-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+    end
+
+    CONC ==>|modèle Champion| DEPL
 ```
 
-Les pipelines sont pilotés par des fichiers YAML validés par Pydantic : un job par étape du cycle de vie (`tuning` → `training` → `evaluations` → `promotion` → `inference`), chaque exécution tracée dans un run MLflow avec la lineage des données d'entrée. Le modèle promu (alias `Champion`) est embarqué dans l'image de l'API ; la CI construit les deux images, les pousse sur Docker Hub puis déploie les deux services Cloud Run.
-
-### Stack
-
-| Domaine | Brique | Rôle |
-| :--- | :--- | :--- |
-| Data & Analytics | Dataset FAO, `pandas` | Fusion des séries de rendements, pluviométrie, pesticides et températures |
-| Data & Analytics | `pandera` | Schémas d'entrée, de cible et de sortie, vérifiés aussi côté API |
-| Data & Analytics | `OmegaConf`, `pydantic-settings` | Configuration déclarative des jobs (union discriminée par `KIND`) |
-| Machine Learning | `scikit-learn` (`TargetEncoder`), `XGBoost` | Preprocessing sans fuite et modèle de régression (vs `RandomForest`) |
-| Machine Learning | Split temporel glissant (5 ans d'entraînement, 1 an de test), holdout 2013 | Évaluation réaliste en contexte de dérive |
-| Machine Learning | `SHAP` | Importances de features et valeurs SHAP sur échantillon |
-| MLOps | `MLflow` | Tracking des expériences, model registry, alias `Champion`, lineage des données |
-| MLOps | `pytest` (couverture ≥ 80 %), `ruff`, `ty` | Garde-fous de qualité dans la CI |
-| MLOps | Docker, Docker Hub, GitHub Actions | Deux images (API, UI) construites et publiées automatiquement |
-| Industrialisation | Google Cloud Run, Workload Identity Federation | Deux services publics en `europe-west1`, scale-to-zero, déploiement par digest |
-| Interfaces | `FastAPI`, `Gradio` | Service de prédiction documenté (Swagger) et interface métier légère |
-| Industrialisation | `uv`, `just`, Zensical | Environnement, raccourcis de commandes, documentation publiée |
-
-### Liens
-
-- **Démo (interface)** : [agri-ui](https://agri-ui-28873275232.europe-west1.run.app)
-- **Démo (API + Swagger)** : [agri-api/docs](https://agri-api-28873275232.europe-west1.run.app/docs)
-- **Code** : [github.com/olivierbinder/agri](https://github.com/olivierbinder/agri)
-- **Doc technique** : [olivierbinder.github.io/agri](https://olivierbinder.github.io/agri/)
+</details>
 
 ---
 
@@ -227,7 +254,7 @@ flowchart LR
 
 ## :lucide-whistle: &nbsp; App Basket
 
-À destination des passionnés de NBA, cette application répond à des **questions pointues sur la saison** à partir de sources hétérogènes — discussions Reddit et statistiques structurées — grâce à un **RAG hybride** (recherche vectorielle et agent SQL), et **mesure la qualité de ses réponses** sur un jeu de cas de référence. [**Lien vers l'application**](https://llmeval-nba.streamlit.app/) (cold start)
+À destination des passionnés de NBA, cette application répond à des **questions pointues sur la saison** à partir de sources hétérogènes — discussions Reddit et statistiques structurées — grâce à un **RAG hybride** (recherche vectorielle et agent SQL), et **mesure la qualité de ses réponses** sur un jeu de cas de référence. [**Lien vers l'application**](https://llmeval-nba.streamlit.app/) (mot de passe à saisir : nbademo / cold start)
 
 <div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
 
