@@ -1,8 +1,6 @@
 # Applications data & IA que j'ai développées
 
-Quatre projets menés de la conception au déploiement : modélisation supervisée, industrialisation MLOps, entrepôts de données et applications LLM. Pour chacun, cette page présente l'**architecture cible** et les **technologies mobilisées** ; le détail des compétences est regroupé dans la page [Stack](03_stack.md).
-
-Certains projets sont encore en construction : l'architecture décrite est alors l'architecture visée, pas un état livré.
+Quatre projets, de la conception au déploiement, qui parcourent toute la chaîne : préparation et validation des données, entraînement et sélection de modèles, industrialisation MLOps, entrepôt de données, exposition d'un service et interface utilisateur, jusqu'à l'évaluation et l'observabilité d'une application LLM. Pour chacun, cette page présente l'**architecture** et les **technologies mobilisées** — la cible visée pour les projets encore en construction — et le détail des compétences est dans la page [Stack](03_stack.md).
 
 | Projet | Type | En une phrase | Démo |
 | :--- | :--- | :--- | :--- |
@@ -317,9 +315,3 @@ flowchart LR
 ```
 
 </details>
-
----
-
-## :lucide-compass: &nbsp; Ce que ces projets couvrent
-
-Pris ensemble, ils parcourent toute la chaîne : préparation et validation des données, entraînement et sélection de modèles, exposition d'un service, interface utilisateur, évaluation et surveillance, jusqu'à l'industrialisation des pipelines et à l'observabilité d'une application LLM. Le détail des outils et de leur niveau de maîtrise est dans la page [Stack](03_stack.md).
