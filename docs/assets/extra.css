@@ -83,3 +83,41 @@ h3 { font-size: 0.8rem !important; }
 .no-header table thead {
   display: none;
 }
+
+/* Pastilles de navigation vers les projets */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.8rem 0 0.4rem 0;
+}
+
+.md-typeset a.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--ctp-surface1);
+  border-radius: 999px;
+  background: var(--ctp-surface0);
+  color: var(--ctp-text) !important;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.md-typeset a.pill:hover {
+  background: var(--ctp-surface1);
+  border-color: var(--ctp-overlay0);
+}
+
+.md-typeset a.pill svg,
+.md-typeset a.pill .twemoji,
+.md-typeset a.pill .emojione {
+  width: 1rem;
+  height: 1rem;
+  vertical-align: -0.15rem;
+  fill: currentColor;
+}

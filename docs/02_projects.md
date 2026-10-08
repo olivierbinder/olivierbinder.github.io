@@ -1,17 +1,19 @@
 # Applications data & IA que j'ai développées
 
-Quatre projets, de la conception au déploiement, qui parcourent toute la chaîne : préparation et validation des données, entraînement et sélection de modèles, industrialisation MLOps, entrepôt de données, exposition d'un service et interface utilisateur, jusqu'à l'évaluation et l'observabilité d'une application LLM. Pour chacun, cette page présente l'**architecture** et les **technologies mobilisées** — la cible visée pour les projets encore en construction — et le détail des compétences est dans la page [Stack](03_stack.md).
+Quatre projets, de la conception au déploiement, qui couvrent la chaîne data & IA : préparation des données, modélisation, industrialisation MLOps, applications LLM et observabilité. Détail des compétences dans la page [Stack](03_stack.md).
 
-| Projet | Type | En une phrase | Démo |
-| :--- | :--- | :--- | :--- |
-| **Cine** | Projet personnel, en construction | Base cinéma personnelle enrichie de signaux cinéphiles, puis profils pondérés et recommandations | *à venir* |
-| **Agri** | Bootcamp MLOps, déployé | Prédiction et recommandation de rendements agricoles, de l'entraînement au service en ligne | [App](https://agri-ui-28873275232.europe-west1.run.app) |
-| **Crédit** | Bootcamp MLOps, déployé | Prédiction du risque de défaut de remboursement et scoring manipulable par un métier | [App](https://huggingface.co/spaces/OlivierBinder/credit-scoring) |
-| **Basket (llmeval)** | Bootcamp LLMOps, déployé | Assistant NBA augmenté par un RAG hybride, et mesure reproductible de ses réponses | [App](https://llmeval-nba.streamlit.app/) |
+<div class="pills" markdown>
+
+[:lucide-clapperboard: &nbsp; Suggestion de films](#suggestion-de-films){ .pill }
+[:lucide-wheat: &nbsp; Prévision agricole](#prevision-agricole){ .pill }
+[:lucide-whistle: &nbsp; Assistant NBA](#assistant-nba){ .pill }
+[:lucide-piggy-bank: &nbsp; Scoring crédit](#scoring-credit){ .pill }
+
+</div>
 
 ---
 
-## :lucide-clapperboard: &nbsp; App Cinéma
+## :lucide-clapperboard: &nbsp; Suggestion de films
 
 **Projet personnel — en construction**
 
@@ -78,7 +80,7 @@ flowchart LR
 
 ---
 
-## :lucide-wheat: &nbsp; App Agriculture
+## :lucide-wheat: &nbsp; Prévision agricole
 
 À destination des acteurs agricoles, cette application prédit le **rendement d'une culture** à partir de données climatiques et agricoles — pluviométrie, pesticides, température — issues du dataset FAO, et **classe toutes les cultures** pour un contexte donné. [**Lien vers l'application**](https://agri-ui-28873275232.europe-west1.run.app) (cold start)
 
@@ -152,90 +154,7 @@ flowchart LR
 
 ---
 
-## :lucide-piggy-bank: &nbsp; App Crédit
-
-
-À destination d'organismes de crédit, cette application permet de prédire le **risque de défaut d'un demandeur** grace à un modèle de Machine Learning entraîné sur les données historiques des clients ayant honoré ou non leur remboursements. [**Lien vers l'application**](https://huggingface.co/spaces/OlivierBinder/credit-scoring) (cold start)
-
-
-
-<div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
-
-<div style="flex: 0 0 50%;">
-<img src="assets/ui_credit_scoring.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;">
-</div>
-
-<div style="flex: 1;" markdown>
-
-**Parcours utilisateur**
-
-- Chargement des données clients
-- Visualisation par rapport aux autres clients
-- Prédiction du risque de défaut
-- Surveillance de la dérive du modèle et des performances de calcul
-
-</div>
-
-</div>
-
-
-<details markdown>
-<summary><strong>Architecture de la solution</strong></summary>
-
-Côté conception, le feature engineering croise les 8 tables Home Credit et leurs 58 M de lignes —  historiques des demandes de crédits, échéances de remboursement et encours mensuels — pour aboutir à 600 variables, utilisées pour le benchmark des modèles. Les étapes de sélection de variables, d'évaluation et d'optimisation, suivies dans MLflow, ont permis d'obtenir notre modèle cible, dont les prédictions sont expliquées par SHAP.
-
-Côté déploiement, la chaîne CI/CD teste, conteneurise le modèle optimisé au format ONNX et publie l'application sur Hugging Face Spaces : le modèle retenu est exposé via une API FastAPI, interrogée par une interface Streamlit qui intègre le suivi de la dérive des données et du coût d'exécution.
-
-Pour plus de détails, consultez la [documentation technique](https://olivierbinder.github.io/Credit_scoring/) et le [code](https://github.com/olivierbinder/Credit_scoring) du projet.
-
-
-```mermaid
-%%{init: {
-  "theme": "base",
-  "themeVariables": {
-    "fontSize": "16px"
-  },
-  "themeCSS": ".node rect, .node polygon, .node path, .node circle, .node ellipse { fill: var(--ctp-base); stroke: var(--ctp-surface1); stroke-width: 1.5px; }\n.nodeLabel { color: var(--ctp-text); fill: var(--ctp-text); }\n.cluster rect { fill: var(--ctp-mantle); stroke: var(--ctp-surface1); stroke-width: 1px; rx: 10px; ry: 10px; }\n.cluster-label, .cluster .nodeLabel, .cluster span, .cluster text { color: var(--ctp-text); fill: var(--ctp-subtext0); }\n.edgePath .path, .flowchart-link { stroke: var(--ctp-overlay1); stroke-width: 1.5px; }\n.marker, .arrowheadPath { fill: var(--ctp-overlay1); stroke: var(--ctp-overlay1); }\n.edgeLabel { background-color: transparent !important; color: var(--ctp-text) !important; }\n.labelBkg, .edgeLabel .labelBkg, .edgeLabel .label rect, .edgeLabel rect { background-color: var(--ctp-mantle) !important; fill: var(--ctp-mantle) !important; }\n.edgeLabel .label, .edgeLabel span, .edgeLabel text, .edgeLabel p { background-color: var(--ctp-mantle) !important; color: var(--ctp-text) !important; fill: var(--ctp-text) !important; }",
-  "flowchart": {
-    "nodeSpacing": 40,
-    "rankSpacing": 50,
-    "htmlLabels": true,
-    "padding": 15,
-    "curve": "basis",
-    "subGraphTitleMargin": {"top": 20, "bottom": 20}
-  }
-}}%%
-flowchart LR
-    subgraph CONC["<b>Conception · Data Science</b>"]
-        direction TB
-        A[("<b>Données Home Credit</b><br/>8 tables · 58 M lignes")] --> B("<b>Feature engineering</b><br/> Pipelines créant 600 variables <br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        B --> C("<b>Entraînement</b><br/> Suivi des expériences · évaluation et optimisation des modèles · explicabilité<br/><div style='display:flex; flex-wrap:wrap; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MLflow-0194E2?style=for-the-badge&logo=mlflow&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/LightGBM-02569B?style=for-the-badge&logo=microsoft&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/SHAP-FF6F00?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        C --> SPACER["<div style='height:104px'></div>"]:::spacer
-    end
-
-    subgraph DEPL["<b>Déploiement · MLOps</b>"]
-        direction TB
-        G("<b>CI/CD</b><br/>tests · build · publication<br/><div style='display:flex; flex-wrap:wrap; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Hugging%20Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black' height='30' style='display:block; max-width:none;'/></div></div>")
-        G --> D("<b>Modèle final exposé en API</b><br/>/predict · /lookup · /reference<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        D -.->|logs API| M("<b>Monitoring & dérive</b><br/>qualité · latence · coût runtime<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Evidently-ED0500?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/psutil-3776AB?style=for-the-badge&logo=python&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        D --> E("<b>Interface utilisateur</b><br/>prédiction · surveillance<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block;'/></div>")
-        M --> E
-    end
-
-    CONC ==>|modèle validé| DEPL
-
-    classDef spacer fill:transparent,stroke:transparent,color:transparent
-    linkStyle 2 stroke:none,stroke-width:0px,marker-end:none
-
-```
-
-</details>
-
----
-
-
-
-## :lucide-whistle: &nbsp; App Basket
+## :lucide-whistle: &nbsp; Assistant NBA
 
 À destination des passionnés de NBA, cette application répond à des **questions pointues sur la saison** à partir de sources hétérogènes — discussions Reddit et statistiques structurées — grâce à un **RAG hybride** (recherche vectorielle et agent SQL), et **mesure la qualité de ses réponses** sur un jeu de cas de référence. [**Lien vers l'application**](https://llmeval-nba.streamlit.app/) (mot de passe à saisir : nbademo / cold start)
 
@@ -312,6 +231,87 @@ flowchart LR
     end
 
     CONC ==>|index + base| DEPL
+```
+
+</details>
+
+---
+
+## :lucide-piggy-bank: &nbsp; Scoring crédit
+
+
+À destination d'organismes de crédit, cette application permet de prédire le **risque de défaut d'un demandeur** grace à un modèle de Machine Learning entraîné sur les données historiques des clients ayant honoré ou non leur remboursements. [**Lien vers l'application**](https://huggingface.co/spaces/OlivierBinder/credit-scoring) (cold start)
+
+
+
+<div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
+
+<div style="flex: 0 0 50%;">
+<img src="assets/ui_credit_scoring.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;">
+</div>
+
+<div style="flex: 1;" markdown>
+
+**Parcours utilisateur**
+
+- Chargement des données clients
+- Visualisation par rapport aux autres clients
+- Prédiction du risque de défaut
+- Surveillance de la dérive du modèle et des performances de calcul
+
+</div>
+
+</div>
+
+
+<details markdown>
+<summary><strong>Architecture de la solution</strong></summary>
+
+Côté conception, le feature engineering croise les 8 tables Home Credit et leurs 58 M de lignes —  historiques des demandes de crédits, échéances de remboursement et encours mensuels — pour aboutir à 600 variables, utilisées pour le benchmark des modèles. Les étapes de sélection de variables, d'évaluation et d'optimisation, suivies dans MLflow, ont permis d'obtenir notre modèle cible, dont les prédictions sont expliquées par SHAP.
+
+Côté déploiement, la chaîne CI/CD teste, conteneurise le modèle optimisé au format ONNX et publie l'application sur Hugging Face Spaces : le modèle retenu est exposé via une API FastAPI, interrogée par une interface Streamlit qui intègre le suivi de la dérive des données et du coût d'exécution.
+
+Pour plus de détails, consultez la [documentation technique](https://olivierbinder.github.io/Credit_scoring/) et le [code](https://github.com/olivierbinder/Credit_scoring) du projet.
+
+
+```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontSize": "16px"
+  },
+  "themeCSS": ".node rect, .node polygon, .node path, .node circle, .node ellipse { fill: var(--ctp-base); stroke: var(--ctp-surface1); stroke-width: 1.5px; }\n.nodeLabel { color: var(--ctp-text); fill: var(--ctp-text); }\n.cluster rect { fill: var(--ctp-mantle); stroke: var(--ctp-surface1); stroke-width: 1px; rx: 10px; ry: 10px; }\n.cluster-label, .cluster .nodeLabel, .cluster span, .cluster text { color: var(--ctp-text); fill: var(--ctp-subtext0); }\n.edgePath .path, .flowchart-link { stroke: var(--ctp-overlay1); stroke-width: 1.5px; }\n.marker, .arrowheadPath { fill: var(--ctp-overlay1); stroke: var(--ctp-overlay1); }\n.edgeLabel { background-color: transparent !important; color: var(--ctp-text) !important; }\n.labelBkg, .edgeLabel .labelBkg, .edgeLabel .label rect, .edgeLabel rect { background-color: var(--ctp-mantle) !important; fill: var(--ctp-mantle) !important; }\n.edgeLabel .label, .edgeLabel span, .edgeLabel text, .edgeLabel p { background-color: var(--ctp-mantle) !important; color: var(--ctp-text) !important; fill: var(--ctp-text) !important; }",
+  "flowchart": {
+    "nodeSpacing": 40,
+    "rankSpacing": 50,
+    "htmlLabels": true,
+    "padding": 15,
+    "curve": "basis",
+    "subGraphTitleMargin": {"top": 20, "bottom": 20}
+  }
+}}%%
+flowchart LR
+    subgraph CONC["<b>Conception · Data Science</b>"]
+        direction TB
+        A[("<b>Données Home Credit</b><br/>8 tables · 58 M lignes")] --> B("<b>Feature engineering</b><br/> Pipelines créant 600 variables <br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        B --> C("<b>Entraînement</b><br/> Suivi des expériences · évaluation et optimisation des modèles · explicabilité<br/><div style='display:flex; flex-wrap:wrap; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MLflow-0194E2?style=for-the-badge&logo=mlflow&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/LightGBM-02569B?style=for-the-badge&logo=microsoft&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/SHAP-FF6F00?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        C --> SPACER["<div style='height:104px'></div>"]:::spacer
+    end
+
+    subgraph DEPL["<b>Déploiement · MLOps</b>"]
+        direction TB
+        G("<b>CI/CD</b><br/>tests · build · publication<br/><div style='display:flex; flex-wrap:wrap; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Hugging%20Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black' height='30' style='display:block; max-width:none;'/></div></div>")
+        G --> D("<b>Modèle final exposé en API</b><br/>/predict · /lookup · /reference<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        D -.->|logs API| M("<b>Monitoring & dérive</b><br/>qualité · latence · coût runtime<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Evidently-ED0500?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/psutil-3776AB?style=for-the-badge&logo=python&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        D --> E("<b>Interface utilisateur</b><br/>prédiction · surveillance<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block;'/></div>")
+        M --> E
+    end
+
+    CONC ==>|modèle validé| DEPL
+
+    classDef spacer fill:transparent,stroke:transparent,color:transparent
+    linkStyle 2 stroke:none,stroke-width:0px,marker-end:none
+
 ```
 
 </details>
