@@ -1,0 +1,12 @@
+[project]
+name = "olivierbinder-github-io"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "catppuccin-zensical>=0.3.0",
+    "molcrafts-zensical-theme>=0.3.0",
+    "zensical>=0.0.68",
+    "zensical-alloy>=0.2.3",
+]

@@ -1,0 +1,72 @@
+[project]
+site_name = "Olivier Binder"
+site_url = "https://olivierbinder.github.io"
+site_description = "Science des données & gestion de projet"
+site_author = "Olivier Binder"
+
+nav = [
+    { "Présentation" = "index.md" },
+    { "CV" = "01_resume.md" },
+    { "Projets" = "02_projects.md" },
+    { "Stack" = "03_stack.md" },
+    { "Contact" = "04_contact.md" },
+]
+
+# Ajout de la feuille de style personnalisée
+extra_css = ["assets/extra.css"]
+
+
+[project.theme]
+name = "catppuccin"
+features = [
+    "navigation.tabs",
+    "navigation.tabs.sticky"
+]
+
+
+[project.markdown_extensions.pymdownx.emoji]
+emoji_generator = "zensical.extensions.emoji.to_svg"
+emoji_index = "zensical.extensions.emoji.twemoji"
+
+[project.markdown_extensions.toc]
+title = "Sommaire"
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+    { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+
+[[project.theme.palette]]
+scheme = "catppuccin-latte"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+scheme = "catppuccin-mocha"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
+
+[project.theme.icon]
+logo = "lucide/circle-user-round"
+
+[project.extra.catppuccin]
+signature = false
+
+[project.extra]
+generator = false
+
+
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/olivierbinder"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/python"
+link = "https://pypi.org/project/your-package/"
+
+[project.markdown_extensions.attr_list]
+[project.markdown_extensions.md_in_html]
