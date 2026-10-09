@@ -44,6 +44,15 @@
   }
 }
 
+/* Afficher aussi les onglets de navigation sur mobile : le thème les masque en
+   dessous de 76.25em. Le tiroir du bouton hamburger reste disponible en plus,
+   et la barre d'onglets défile horizontalement si elle déborde. */
+@media screen and (max-width: 76.234375em) {
+  .md-tabs {
+    display: block;
+  }
+}
+
 /* Réduction de la taille des titres */
 h1 { font-size: 1rem !important; }
 h2 { font-size: 1rem !important; }

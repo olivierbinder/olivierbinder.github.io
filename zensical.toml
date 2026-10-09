@@ -36,19 +36,20 @@ custom_fences = [
     { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
 ]
 
-[[project.theme.palette]]
-scheme = "catppuccin-latte"
-primary = "custom"
-accent = "custom"
-toggle.icon = "lucide/sun"
-toggle.name = "Switch to dark mode"
-
+# Le premier palette de la liste est celle utilisée par défaut : mocha (sombre).
 [[project.theme.palette]]
 scheme = "catppuccin-mocha"
 primary = "custom"
 accent = "custom"
 toggle.icon = "lucide/moon"
 toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+scheme = "catppuccin-latte"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
 
 [project.theme.icon]
 logo = "lucide/chart-scatter"
@@ -65,8 +66,8 @@ icon = "fontawesome/brands/github"
 link = "https://github.com/olivierbinder"
 
 [[project.extra.social]]
-icon = "fontawesome/brands/python"
-link = "https://pypi.org/project/your-package/"
+icon = "fontawesome/brands/linkedin"
+link = "https://www.linkedin.com/in/olivierbinder/"
 
 [project.markdown_extensions.attr_list]
 [project.markdown_extensions.md_in_html]
