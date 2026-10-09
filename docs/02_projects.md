@@ -8,13 +8,13 @@ Quatre projets de bout en bout, de la préparation des données au déploiement 
 
 Cette application enrichit la base de référence <span class="ctp-mauve">**IMDb**</span> de la fréquentation en salles et de <span class="ctp-mauve">**références cinéphiles soigneusement sélectionnées**</span> : notes des Cahiers du cinéma, sélections de certains festivals, listes personnelles... Elle permet d'explorer l'histoire du cinéma à travers ces regards, de découvrir des <span class="ctp-mauve">**familles de cinéastes**</span>, de recevoir des <span class="ctp-mauve">**recommandations personnalisées**</span> et d'être <span class="ctp-mauve">**conseillé en langage naturel sur tout le catalogue**</span>.
 
-<div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
+<div class="split" markdown>
 
-<div style="flex: 0 0 50%;">
+<div class="split-media">
 <img src="assets/ui_cine.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;border: 1px solid var(--ctp-mauve);">
 </div>
 
-<div style="flex: 1;" markdown>
+<div class="split-body" markdown>
 
 - Enrichissement automatisé de la base : IMDb, références cinéphiles
 - Exploration par cinéastes, régions, périodes, listes
@@ -85,13 +85,13 @@ Pour plus de détails, retrouvez la documentation technique (à venir) et le cod
 À destination des acteurs agricoles, cette application <span class="ctp-mauve">**prédit le rendement d'une culture**</span> et <span class="ctp-mauve">**classe les cultures les plus adaptées**</span> dans un contexte donné (zone, année, pluviométrie, pesticides, température). Entraîné sur des données de la *Food and Agriculture Organization* des années passées, le modèle prédit l'année suivante avec une très bonne précision.
 
 
-<div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
+<div class="split" markdown>
 
-<div style="flex: 0 0 50%;">
+<div class="split-media">
 <img src="assets/ui_agri.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;border: 1px solid var(--ctp-mauve);">
 </div>
 
-<div style="flex: 1;" markdown>
+<div class="split-body" markdown>
 
 **Parcours utilisateur**
 
@@ -161,13 +161,13 @@ Pour plus de détails, consultez la [documentation technique](https://olivierbin
 À destination des passionnés de basket, cette application est un <span class="ctp-mauve">**chatbot Mistral enrichi de données externes**</span> (discussions Reddit de fans et tableaux Excel de statistiques) pour répondre à des <span class="ctp-mauve">**questions pointues sur la saison NBA**</span>. Une évaluation sur un jeu de questions de référence a permis de valider l'amélioration des réponses.
 
 
-<div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
+<div class="split" markdown>
 
-<div style="flex: 0 0 50%;">
+<div class="split-media">
 <img src="assets/ui_nba.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;border: 1px solid var(--ctp-mauve);">
 </div>
 
-<div style="flex: 1;" markdown>
+<div class="split-body" markdown>
 
 - Réponse donnée avec ses sources et la stratégie mobilisée (FAISS / SQL)
 - Niveau de confiance et alerte contexte insuffisant
@@ -239,13 +239,13 @@ Pour plus de détails, consultez la [documentation technique](https://olivierbin
 À destination d'organismes de crédit, cette application prédit le <span class="ctp-mauve">**risque de défaut d'un demandeur**</span> à l'aide d'un modèle de Machine Learning entraîné sur l'historique de clients ayant honoré ou non leurs remboursements.
 
 
-<div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
+<div class="split" markdown>
 
-<div style="flex: 0 0 50%;">
+<div class="split-media">
 <img src="assets/ui_credit_scoring.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;border: 1px solid var(--ctp-mauve);">
 </div>
 
-<div style="flex: 1;" markdown>
+<div class="split-body" markdown>
 
 
 - Recherche d'un client
