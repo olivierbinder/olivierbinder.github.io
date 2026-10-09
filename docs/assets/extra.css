@@ -35,9 +35,13 @@
   margin-left: 0 !important;
 }
 
-/* Supprimer la barre latérale gauche si elle persiste */
-.md-sidebar--primary {
-  display: none;
+/* Masquer la barre latérale gauche sur grand écran : la navigation passe par
+   les onglets du header. En dessous de 76.25em, cette même barre EST le tiroir
+   ouvert par le bouton hamburger : il ne faut donc surtout pas la masquer. */
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary {
+    display: none;
+  }
 }
 
 /* Réduction de la taille des titres */
