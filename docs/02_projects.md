@@ -1,44 +1,38 @@
 # Applications data & IA que j'ai développées
 
-Quatre projets, de la conception au déploiement, qui couvrent la chaîne data & IA : préparation des données, modélisation, industrialisation MLOps, applications LLM et observabilité. Détail des compétences dans la page [Stack](03_stack.md).
-
-<div class="pills" markdown>
-
-[:lucide-clapperboard: &nbsp; Suggestion de films](#suggestion-de-films){ .pill }
-[:lucide-wheat: &nbsp; Prévision agricole](#prevision-agricole){ .pill }
-[:lucide-whistle: &nbsp; Assistant NBA](#assistant-nba){ .pill }
-[:lucide-piggy-bank: &nbsp; Scoring crédit](#scoring-credit){ .pill }
-
-</div>
+Quatre projets de bout en bout, de la préparation des données au déploiement : modélisation, industrialisation MLOps, applications LLM et suivi en production.
 
 ---
 
 ## :lucide-clapperboard: &nbsp; Suggestion de films
 
-**Projet personnel — en construction**
+Cette application enrichit la base de référence <span class="ctp-mauve">**IMDb**</span> de la fréquentation en salles et de <span class="ctp-mauve">**références cinéphiles soigneusement sélectionnées**</span> : notes des Cahiers du cinéma, sélections de certains festivals, listes personnelles... Elle permet d'explorer l'histoire du cinéma à travers ces regards, de découvrir des <span class="ctp-mauve">**familles de cinéastes**</span>, de recevoir des <span class="ctp-mauve">**recommandations personnalisées**</span> et d'être <span class="ctp-mauve">**conseillé en langage naturel sur tout le catalogue**</span>.
 
-À destination des cinéphiles, ce projet construit une **base cinéma personnelle** à partir d'IMDb, enrichie de signaux de prescription — sélections de cinéastes, critiques, festivals, institutions, revues — pour explorer les films et les cinéastes, puis à terme produire des **recommandations personnelles** à partir d'une liste de films préférés. Le projet n'est pas terminé : ni démo publiée, ni dépôt public pour le moment, mais une interface Streamlit de consultation existe déjà en local.
+<div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
 
-**Parcours utilisateur (cible)**
+<div style="flex: 0 0 50%;">
+<img src="assets/ui_cine.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;border: 1px solid var(--ctp-mauve);">
+</div>
 
-- Mettre à jour les référentiels IMDb et importer un nouveau signal cinéphile
-- Valider les correspondances ambiguës en zone de staging
-- Explorer une filmographie, un cinéaste, un pays, une période ou un signal
-- Comparer critiques et public, mesurer la couverture de la base
-- Créer des profils cinéphiles et pondérer les signaux selon ses affinités
-- Obtenir des recommandations à partir d'une liste de films préférés *(à venir)*
+<div style="flex: 1;" markdown>
 
+- Enrichissement automatisé de la base : IMDb, références cinéphiles
+- Exploration par cinéastes, régions, périodes, listes
+- Comparaison critiques et public
+- Profil cinéphile et recommandations à partir de films préférés
+- Conseils en langage naturel par un agent conversationnel, justifiés par les signaux
+
+</div>
+
+</div>
+
+*Lien vers l'application à venir*
 
 <details markdown>
-<summary><strong>Architecture cible</strong></summary>
+<summary><strong>Architecture de la solution</strong></summary>
 
-Côté données, le projet sépare les **référentiels bruts** (`ref_*` : œuvres, personnes, contributeurs, notes IMDb, territoires), les **zones de staging** (`stg_*`) relues manuellement et le **cœur métier** consolidé. Tous les signaux partagent le même modèle, quel que soit leur émetteur : un **agent** (cinéaste, critique, revue, institution, festival, audience) applique une **valeur** — sélection classée ou non, distinction, note, mesure — à des films ou à des cinéastes, avec son périmètre (période, pays, genre, durée). L'intégration est semi-automatique : collecte, normalisation, résolution en cascade des titres et des noms, puis revue manuelle des cas ambigus avant chargement dans le cœur métier.
 
-Côté technique, l'entrepôt est un **DuckDB** local organisé en miroir du code (`ref_*` / `stg_*` / cœur), avec des schémas de garde-frontière Pydantic et `pandera`, des recettes `just` par domaine et une interface **Streamlit** de consultation déjà amorcée (filmographies, cinéastes par pays, critiques face au public, couverture, correspondances à relire). La cible est de basculer la base sur **MotherDuck** afin de publier l'application sur un entrepôt cloud, sans changer le modèle de données.
 
-La dernière brique reste à construire : le volet apprentissage. D'abord un **clustering** des signaux pour dégager des *familles de cinéastes* (affinités, coréalisations, proximités de goût), puis un moteur de **recommandation** qui, à partir d'une liste de films préférés, pondère les signaux selon le profil pour proposer des films.
-
-Pour plus de détails, consultez la documentation technique du projet (locale pour l'instant : processus de référence, de signaux et d'enrichissement, modèle des signaux, dictionnaire des tables).
 
 
 ```mermaid
@@ -60,21 +54,27 @@ Pour plus de détails, consultez la documentation technique du projet (locale po
 flowchart LR
     subgraph CONC["<b>Conception · Données & signaux</b>"]
         direction TB
-        A(("<b>Sources</b><br/>IMDb · Wikidata<br/>signaux cinéphiles")) --> B("<b>Ingestion & matching</b><br/>normalisation · résolution en cascade<br/>revue manuelle des cas ambigus<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pandera-2C5F8A?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        B --> C("<b>Entrepôt DuckDB</b><br/>ref_* · stg_* · cœur métier<br/>agents · signaux · films · cinéastes · profils<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/DuckDB-FFF000?style=for-the-badge&logo=duckdb&logoColor=black' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        C --> D("<b>Consultation</b><br/>filmographies · pays · critiques vs public<br/>couverture de la base<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        A[("<b>Sources</b><br/>IMDb · Wikidata · signaux cinéphiles")] --> B("<b>Ingestion & matching</b><br/>collecte · résolution en cascade · revue manuelle<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/dlt-4B4B8F?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pandera-2C5F8A?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        B --> C("<b>Entrepôt & transformations</b><br/>ref_* · stg_* · cœur métier<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/DuckDB-FFF000?style=for-the-badge&logo=duckdb&logoColor=black' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/dbt-FF694B?style=for-the-badge&logo=dbt&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        C --> D("<b>Orchestration</b><br/>assets · planification · contrôles qualité<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Dagster-4F43DD?style=for-the-badge&logo=dagster&logoColor=white' height='30' style='display:block;'/></div>")
     end
 
-    subgraph DEPL["<b>Cible · Application & modèles</b>"]
+    subgraph DEPL["<b>Déploiement · Application & modèles</b>"]
         direction TB
-        E("<b>Base cloud</b><br/>entrepôt partagé, même modèle de données<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MotherDuck-1B1B1B?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        E --> F("<b>Application Streamlit</b><br/>exploration · profils · pondérations<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        F -.->|à venir| G("<b>Familles de cinéastes</b><br/>clustering des signaux · affinités et coréalisations<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        F -.->|à venir| H("<b>Recommandations</b><br/>liste de films préférés · pondération par profil<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        E("<b>Base cloud</b><br/>entrepôt partagé, même modèle de données<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MotherDuck-1B1B1B?style=for-the-badge&logoColor=white' height='30' style='display:block;'/></div>")
+        E --> F("<b>Application Streamlit</b><br/>exploration · profils · pondérations<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        F --> G("<b>Familles & recommandations</b><br/>clustering des signaux · profil de goût<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block;'/></div>")
+        G --> H("<b>Agent conversationnel</b><br/>conseils fondés sur les films et les signaux<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Mistral%20AI-FA520F?style=for-the-badge&logo=mistralai&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic%20AI-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
     end
 
-    CONC ==>|bascule de la base| DEPL
+    CONC ==>|publication de la base| DEPL
 ```
+Côté données, dlt collecte IMDb, Wikidata et les signaux cinéphiles, puis les cas ambigus sont résolus par une cascade de règles et une revue manuelle. dbt transforme ensuite les référentiels bruts et les zones de staging en un cœur métier où tous les signaux partagent le même modèle : un agent (critique, festival, cinéaste…) applique une valeur à un film ou à un cinéaste. Dagster orchestre l'ensemble et contrôle la qualité à chaque exécution.
+
+Côté application, l'entrepôt est publié sur MotherDuck et alimente l'interface Streamlit, qui permet d'explorer l'histoire du cinéma à travers ces regards. Un clustering des signaux dégage des familles de cinéastes, et la recommandation pondère les signaux selon le profil de l'utilisateur. Un agent conversationnel conseille des films en s'appuyant sur la base et sur ces signaux.
+
+Pour plus de détails, retrouvez la documentation technique (à venir) et le code (à venir) du projet.
+
 
 </details>
 
@@ -82,12 +82,13 @@ flowchart LR
 
 ## :lucide-wheat: &nbsp; Prévision agricole
 
-À destination des acteurs agricoles, cette application prédit le **rendement d'une culture** à partir de données climatiques et agricoles — pluviométrie, pesticides, température — issues du dataset FAO, et **classe toutes les cultures** pour un contexte donné. [**Lien vers l'application**](https://agri-ui-28873275232.europe-west1.run.app) (cold start)
+À destination des acteurs agricoles, cette application <span class="ctp-mauve">**prédit le rendement d'une culture**</span> et <span class="ctp-mauve">**classe les cultures les plus adaptées**</span> dans un contexte donné (zone, année, pluviométrie, pesticides, température). Entraîné sur des données de la *Food and Agriculture Organization* des années passées, le modèle prédit l'année suivante avec une très bonne précision.
+
 
 <div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
 
 <div style="flex: 0 0 50%;">
-<img src="assets/ui_agri.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;">
+<img src="assets/ui_agri.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;border: 1px solid var(--ctp-mauve);">
 </div>
 
 <div style="flex: 1;" markdown>
@@ -95,24 +96,21 @@ flowchart LR
 **Parcours utilisateur**
 
 - Choix de la zone, de la culture et de l'année
-- Réglage des conditions (pluviométrie, pesticides, température) ou reprise des conditions réellement enregistrées
+- Réglage des conditions (pluviométrie, pesticides, température)
 - Prédiction du rendement de la culture sélectionnée
-- Classement de toutes les cultures par score relatif, pour le même contexte
-- Onglet par usage : prédiction ou recommandation, servis par l'API
+- Classement de toutes les cultures pour le même contexte
 
 </div>
 
 </div>
 
+[*Lien vers l'application*](https://agri-ui-28873275232.europe-west1.run.app) (premier chargement lent)
 
 <details markdown>
 <summary><strong>Architecture de la solution</strong></summary>
 
-Côté conception, le pipeline part du dataset FAO et d'un **split par année** — 1990-2012 pour l'entraînement, 2013 en holdout — pour coller au cas d'usage réel : réentraîner chaque année et prédire l'année suivante. Le feature engineering ajoute trois variables métier (interaction pluie/température, efficacité de la pluie, écart à la température optimale de la culture), `Area` et `Item` sont encodés par un `TargetEncoder` validé en 5 folds, et les schémas d'entrée, de cible et de sortie sont contrôlés par `pandera`. Le tuning (`RandomizedSearchCV`, 30 combinaisons) s'appuie sur une validation glissante « 5 ans d'entraînement / 1 an de test » déroulée sur tout l'historique (17 folds) : la dérive temporelle des rendements rend les fenêtres courtes plus pertinentes, une fenêtre de 5 ans minimisant le RMSE (20 652 ± 1 306) contre 23 826 sur 20 ans. Le modèle final (`XGBoost`, baseline `RandomForest`) est entraîné sur les 5 dernières années, signé, enregistré dans le **MLflow Model Registry** puis promu par l'alias `Champion` (meilleur `R2_test`) ; importances et valeurs `SHAP` documentent ses décisions. Dernier run : `RMSE_test` ≈ 19 653 et `R2_test` ≈ 0,959 sur le holdout 2013.
 
-Côté déploiement, deux images Docker indépendantes sont construites par la CI puis déployées sur **Google Cloud Run** (`europe-west1`, scale-to-zero) : `agri-api` embarque le modèle `Champion` (bundle exporté du registre, aucun registre MLflow au runtime) et expose `/predict` et `/recommend` avec sa [documentation Swagger](https://agri-api-28873275232.europe-west1.run.app/docs) ; `agri-ui` reste volontairement légère (Gradio seul, sans stack ML) et interroge l'API via `API_URL`. Déploiement par digest, authentification sans clé (Workload Identity Federation) et notification d'échec en fin de pipeline.
 
-Pour plus de détails, consultez la [documentation technique](https://olivierbinder.github.io/agri/) et le [code](https://github.com/olivierbinder/agri) du projet.
 
 
 ```mermaid
@@ -134,68 +132,59 @@ Pour plus de détails, consultez la [documentation technique](https://olivierbin
 flowchart LR
     subgraph CONC["<b>Conception · Data Science</b>"]
         direction TB
-        A(("<b>Données FAO</b><br/>rendements · pluviométrie<br/>pesticides · température")) --> B("<b>Feature engineering</b><br/>3 variables métier · TargetEncoder 5 folds<br/>schémas validés par pandera<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        B --> C("<b>Entraînement & tuning</b><br/>RandomizedSearchCV · fenêtre glissante 5 ans / 1 an<br/>XGBoost vs RandomForest<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/XGBoost-006ACC?style=for-the-badge&logo=xgboost&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MLflow-0194E2?style=for-the-badge&logo=mlflow&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        C --> D("<b>Promotion & explicabilité</b><br/>alias Champion (meilleur R2) · importances et valeurs SHAP<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MLflow-0194E2?style=for-the-badge&logo=mlflow&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/SHAP-FF6F00?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        A[("<b>Données FAO</b><br/>rendements · pluviométrie · température")] --> B("<b>Feature engineering</b><br/> Variables métier · encodage · schémas validés <br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        B --> C("<b>Entraînement</b><br/> Suivi des expériences · tuning sur fenêtre glissante · explicabilité<br/><div style='display:flex; flex-wrap:wrap; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MLflow-0194E2?style=for-the-badge&logo=mlflow&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/XGBoost-006ACC?style=for-the-badge&logo=xgboost&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/SHAP-FF6F00?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
     end
 
     subgraph DEPL["<b>Déploiement · MLOps</b>"]
         direction TB
-        E("<b>CI/CD</b><br/>tests ≥ 80 % · build · publication<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        E --> F("<b>Images Docker Hub</b><br/>agri-api (modèle embarqué) · agri-ui (Gradio seul)<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Docker%20Hub-2496ED?style=for-the-badge&logo=docker&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        F --> G("<b>Modèle final exposé en API</b><br/>/predict · /recommend · Swagger<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        G --> H("<b>Interface utilisateur</b><br/>prédiction · classement des cultures<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Gradio-FF7C00?style=for-the-badge&logo=gradio&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Google%20Cloud-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        E("<b>CI/CD</b><br/>tests · build · publication<br/><div style='display:flex; flex-wrap:wrap; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Google%20Cloud-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        E --> F("<b>Modèle final exposé en API</b><br/>/predict · /recommend<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        F --> G("<b>Interface utilisateur</b><br/>prédiction · classement des cultures<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Gradio-FF7C00?style=for-the-badge&logo=gradio&logoColor=white' height='30' style='display:block;'/></div>")
     end
 
     CONC ==>|modèle Champion| DEPL
+
 ```
+Côté conception, le feature engineering enrichit les données FAO de trois variables métier et encode la zone et la culture par un `TargetEncoder`, avec des schémas contrôlés par `pandera`. Le split par année (1990-2012 en entraînement, 2013 en holdout) reproduit le cas d'usage réel : réentraîner chaque année et prédire la suivante. Après tuning sur fenêtre glissante et suivi dans MLflow, le modèle retenu est un XGBoost (R² ≈ 0,96 sur le holdout), promu par l'alias `Champion` et expliqué par SHAP.
+
+Côté déploiement, la chaîne CI/CD teste le code, construit deux images Docker et les déploie sur Google Cloud Run. L'API FastAPI embarque le modèle et l'expose, avec sa [documentation Swagger](https://agri-api-28873275232.europe-west1.run.app/docs), à une interface Gradio légère.
+
+Pour plus de détails, consultez la [documentation technique](https://olivierbinder.github.io/agri/) et le [code](https://github.com/olivierbinder/agri) du projet.
+
 
 </details>
 
 ---
 
 ## :lucide-whistle: &nbsp; Assistant NBA
+À destination des passionnés de basket, cette application est un <span class="ctp-mauve">**chatbot Mistral enrichi de données externes**</span> (discussions Reddit de fans et tableaux Excel de statistiques) pour répondre à des <span class="ctp-mauve">**questions pointues sur la saison NBA**</span>. Une évaluation sur un jeu de questions de référence a permis de valider l'amélioration des réponses.
 
-À destination des passionnés de NBA, cette application répond à des **questions pointues sur la saison** à partir de sources hétérogènes — discussions Reddit et statistiques structurées — grâce à un **RAG hybride** (recherche vectorielle et agent SQL), et **mesure la qualité de ses réponses** sur un jeu de cas de référence. [**Lien vers l'application**](https://llmeval-nba.streamlit.app/) (mot de passe à saisir : nbademo / cold start)
 
 <div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
 
 <div style="flex: 0 0 50%;">
-<img src="assets/ui_nba.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;">
+<img src="assets/ui_nba.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;border: 1px solid var(--ctp-mauve);">
 </div>
 
 <div style="flex: 1;" markdown>
 
-**Parcours utilisateur**
-
-- Question libre ou choix d'un cas d'exemple
-- Réponse sourcée, avec la stratégie mobilisée : recherche vectorielle ou requête SQL
-- Niveau de confiance et signalement d'un contexte insuffisant
-- Détail des contextes récupérés, des scores, de la latence et des tokens
-- Consultation des rapports d'évaluation dans l'application
+- Réponse donnée avec ses sources et la stratégie mobilisée (FAISS / SQL)
+- Niveau de confiance et alerte contexte insuffisant
+- Scores, latence et tokens consommés
+- Consultation des rapports d'évaluation
 
 </div>
 
 </div>
 
+[*Lien vers l'application*](https://llmeval-nba.streamlit.app/) (mot de passe : `nbademo` / premier chargement lent)
 
 <details markdown>
 <summary><strong>Architecture de la solution</strong></summary>
 
-Côté conception, l'ingestion unifie des sources hétérogènes — discussions Reddit (PDF) et statistiques NBA (Excel) — en deux socles : un **index vectoriel FAISS** alimenté par les embeddings Mistral, et une **base SQLite** des statistiques structurées. L'agent route ensuite chaque question : recherche vectorielle (`k = 5`) pour le qualitatif, agent SQL (requêtes `SELECT` et `WITH` uniquement, avec repli automatique sur le vectoriel) pour le chiffré. La réponse est structurée — texte, sources réellement utilisées, niveau de confiance, signalement d'un contexte insuffisant — et validée par un schéma Pydantic.
 
-Côté évaluation, la qualité est mesurée sur un jeu de cas versionné (questions et réponses de référence en YAML) : exécution avec pydantic-evals, notation RAGAS sur quatre métriques, traces et coûts dans Logfire, rapports Markdown et CSV générés à chaque run pour comparer les versions du pipeline. Deux versions ont été comparées sur le même jeu de questions :
 
-| Version | Stratégie | Faithfulness | Relevancy | Precision | Recall |
-| :--- | :--- | ---: | ---: | ---: | ---: |
-| `v0` | FAISS seul | 0,817 | 0,611 | 0,642 | 0,542 |
-| `v1` | Hybride FAISS + SQL | **0,875** | **0,825** | **0,762** | **0,742** |
-
-Le gain vient principalement des questions chiffrées : sur les cas traités réellement par SQL, la fidélité passe de 0,500 à 1,000 et le rappel de 0,000 à 1,000.
-
-Côté déploiement, l'application Streamlit est publiée sur **Streamlit Community Cloud** depuis le dépôt : seuls l'index, les chunks et la base (≈ 2 Mo) sont versionnés, les dépendances de l'app sont isolées du reste du projet pour un build léger, et l'accès peut être protégé par mot de passe avec un quota de questions par session.
-
-Pour plus de détails, consultez la [documentation technique](https://olivierbinder.github.io/llmeval/) et le [code](https://github.com/olivierbinder/llmeval) du projet (données, pipeline RAG, évaluation, résultats).
 
 
 ```mermaid
@@ -217,21 +206,28 @@ Pour plus de détails, consultez la [documentation technique](https://olivierbin
 flowchart LR
     subgraph CONC["<b>Conception · Données & RAG</b>"]
         direction TB
-        A[("<b>Sources NBA</b><br/>discussions Reddit (PDF)<br/>statistiques (Excel)")] --> B("<b>Ingestion & indexation</b><br/>chunking · embeddings Mistral<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/PyMuPDF-EF3939?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/FAISS-0467DF?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        B --> C("<b>Agent RAG hybride</b><br/>recherche vectorielle (k = 5) · agent SQL en repli<br/>réponse structurée : sources · confiance<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Mistral%20AI-FA520F?style=for-the-badge&logo=mistralai&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic%20AI-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        C --> D("<b>Évaluation reproductible</b><br/>jeu de cas · métriques RAGAS · rapports<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pydantic--evals-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/RAGAS-9C27B0?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Logfire-7B2BF9?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        A[("<b>Sources NBA</b><br/>discussions Reddit · statistiques Excel")] --> B("<b>Ingestion & indexation</b><br/>chunking · embeddings · base SQL<br/><div style='display:flex; flex-wrap:wrap; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/PyMuPDF-EF3939?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/FAISS-0467DF?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        B --> C("<b>Agent RAG hybride</b><br/>recherche vectorielle · agent SQL en repli<br/><div style='display:flex; flex-wrap:wrap; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Mistral%20AI-FA520F?style=for-the-badge&logo=mistralai&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic%20AI-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        C --> D("<b>Évaluation reproductible</b><br/>jeu de cas · métriques · rapports<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pydantic--evals-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/RAGAS-9C27B0?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
     end
 
     subgraph DEPL["<b>Déploiement · Application</b>"]
         direction TB
-        H("<b>Artefacts versionnés</b><br/>index FAISS · chunks · base SQLite<br/>≈ 2 Mo, démarrage sans ingestion<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Git-181717?style=for-the-badge&logo=git&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        H --> E("<b>Application Streamlit</b><br/>questions · sources · métriques · rapports<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit%20Cloud-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        E -.->|traces| G("<b>Observabilité</b><br/>traces · coûts · latence<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Logfire-7B2BF9?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/OpenTelemetry-000000?style=for-the-badge&logo=opentelemetry&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        E --> F("<b>Accès & coûts maîtrisés</b><br/>mot de passe · quota par session")
+        H("<b>Artefacts versionnés</b><br/>index · chunks · base (≈ 2 Mo)<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Git-181717?style=for-the-badge&logo=git&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        H --> I("<b>Publication</b><br/>démarrage sans ré-ingestion<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit%20Cloud-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        I --> E("<b>Application Streamlit</b><br/>questions · sources · rapports<br/>mot de passe · quota par session<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block;'/></div>")
+        E -.->|traces| G("<b>Observabilité</b><br/>traces · latence · coûts<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Logfire-7B2BF9?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/OpenTelemetry-000000?style=for-the-badge&logo=opentelemetry&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
     end
 
     CONC ==>|index + base| DEPL
+
 ```
+Côté conception, l'ingestion transforme les discussions Reddit et les statistiques Excel en un index vectoriel FAISS et une base SQLite. L'agent oriente chaque question vers la recherche vectorielle ou vers le SQL, puis renvoie une réponse structurée avec ses sources et son niveau de confiance. Évalué avec RAGAS sur un jeu de questions de référence, le pipeline hybride améliore nettement la fidélité et le rappel par rapport à la recherche vectorielle seule.
+
+Côté déploiement, seuls les artefacts légers sont versionnés, ce qui permet à l'application Streamlit de démarrer sans ré-ingestion sur Streamlit Community Cloud, avec un accès protégé par mot de passe et un quota de questions par session. Les traces, la latence et les coûts sont suivis dans Logfire.
+
+Pour plus de détails, consultez la [documentation technique](https://olivierbinder.github.io/llmeval/) et le [code](https://github.com/olivierbinder/llmeval) du projet.
+
 
 </details>
 
@@ -240,38 +236,34 @@ flowchart LR
 ## :lucide-piggy-bank: &nbsp; Scoring crédit
 
 
-À destination d'organismes de crédit, cette application permet de prédire le **risque de défaut d'un demandeur** grace à un modèle de Machine Learning entraîné sur les données historiques des clients ayant honoré ou non leur remboursements. [**Lien vers l'application**](https://huggingface.co/spaces/OlivierBinder/credit-scoring) (cold start)
-
+À destination d'organismes de crédit, cette application prédit le <span class="ctp-mauve">**risque de défaut d'un demandeur**</span> à l'aide d'un modèle de Machine Learning entraîné sur l'historique de clients ayant honoré ou non leurs remboursements.
 
 
 <div style="display: flex; gap: 1rem; align-items: flex-start;" markdown>
 
 <div style="flex: 0 0 50%;">
-<img src="assets/ui_credit_scoring.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;">
+<img src="assets/ui_credit_scoring.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;border: 1px solid var(--ctp-mauve);">
 </div>
 
 <div style="flex: 1;" markdown>
 
-**Parcours utilisateur**
 
-- Chargement des données clients
-- Visualisation par rapport aux autres clients
+- Recherche d'un client
+- Positionnement par rapport à la clientèle
 - Prédiction du risque de défaut
-- Surveillance de la dérive du modèle et des performances de calcul
+- Suivi de la dérive des données et du coût d'exécution
 
 </div>
 
 </div>
 
+[*Lien vers l'application*](https://huggingface.co/spaces/OlivierBinder/credit-scoring) (premier chargement lent)
 
 <details markdown>
 <summary><strong>Architecture de la solution</strong></summary>
 
-Côté conception, le feature engineering croise les 8 tables Home Credit et leurs 58 M de lignes —  historiques des demandes de crédits, échéances de remboursement et encours mensuels — pour aboutir à 600 variables, utilisées pour le benchmark des modèles. Les étapes de sélection de variables, d'évaluation et d'optimisation, suivies dans MLflow, ont permis d'obtenir notre modèle cible, dont les prédictions sont expliquées par SHAP.
 
-Côté déploiement, la chaîne CI/CD teste, conteneurise le modèle optimisé au format ONNX et publie l'application sur Hugging Face Spaces : le modèle retenu est exposé via une API FastAPI, interrogée par une interface Streamlit qui intègre le suivi de la dérive des données et du coût d'exécution.
 
-Pour plus de détails, consultez la [documentation technique](https://olivierbinder.github.io/Credit_scoring/) et le [code](https://github.com/olivierbinder/Credit_scoring) du projet.
 
 
 ```mermaid
@@ -313,5 +305,12 @@ flowchart LR
     linkStyle 2 stroke:none,stroke-width:0px,marker-end:none
 
 ```
+Côté conception, le feature engineering croise les 8 tables Home Credit et leurs 58 M de lignes (historiques de demandes de crédit, échéances de remboursement, encours mensuels) pour produire 600 variables. Après benchmark de plusieurs modèles, sélection de variables et optimisation, suivis dans MLflow, le modèle retenu est un LightGBM, dont les prédictions sont expliquées par SHAP.
+
+Côté déploiement, la chaîne CI/CD teste le code, convertit le modèle au format ONNX, conteneurise l'API et la publie sur Hugging Face Spaces. L'API FastAPI expose le modèle à une interface Streamlit, qui intègre le suivi de la dérive des données et du coût d'exécution.
+
+Pour plus de détails, retrouvez la [documentation technique](https://olivierbinder.github.io/Credit_scoring/) et le [code](https://github.com/olivierbinder/Credit_scoring) du projet.
+
 
 </details>
+

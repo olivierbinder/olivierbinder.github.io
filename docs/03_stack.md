@@ -78,7 +78,7 @@ Déployer, servir et surveiller les applications en production.
 | Apps & interfaces | <span class="ctp-green">`Gradio` · `Streamlit` </span> |
 | Observabilité plateforme | `OpenTelemetry` · `Grafana` |
 
-###  Spécifique modèle ML (MLOps)
+###  Spécifique modèle ML
 
 | Compétences | Outils |
 | :--- | :--- |
@@ -89,7 +89,7 @@ Déployer, servir et surveiller les applications en production.
 | Orchestration de pipelines ML | `ZenML` · `Kubeflow` |
 | Monitoring drift & qualité | <span class="ctp-green">`Evidently`</span> |
 
-### Spécifique application LLM (LLMOps)
+### Spécifique application LLM
 
 | Compétences | Outils |
 | :--- | :--- |

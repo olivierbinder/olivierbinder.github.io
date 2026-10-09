@@ -7,7 +7,7 @@ site_author = "Olivier Binder"
 nav = [
     { "Présentation" = "index.md" },
     { "CV" = "01_resume.md" },
-    { "Projets" = "02_projects.md" },
+    { "Projets Data / IA" = "02_projects.md" },
     { "Stack" = "03_stack.md" },
     { "Contact" = "04_contact.md" },
 ]
@@ -51,7 +51,7 @@ toggle.icon = "lucide/moon"
 toggle.name = "Switch to light mode"
 
 [project.theme.icon]
-logo = "lucide/circle-user-round"
+logo = "lucide/chart-scatter"
 
 [project.extra.catppuccin]
 signature = false
@@ -70,3 +70,5 @@ link = "https://pypi.org/project/your-package/"
 
 [project.markdown_extensions.attr_list]
 [project.markdown_extensions.md_in_html]
+[project.markdown_extensions.abbr]
+[project.markdown_extensions.footnotes]
