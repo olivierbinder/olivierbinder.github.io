@@ -1,86 +1,10 @@
 # Applications data & IA que j'ai développées
 
-Quatre projets de bout en bout, de la préparation des données au déploiement : modélisation, industrialisation MLOps, applications LLM et suivi en production.
+Quatre projets de bout en bout, de la préparation des données au déploiement.
 
 ---
 
-## :lucide-clapperboard: &nbsp; Suggestion de films
-
-Cette application enrichit la base de référence <span class="ctp-mauve">**IMDb**</span> de la fréquentation en salles et de <span class="ctp-mauve">**références cinéphiles soigneusement sélectionnées**</span> : notes des Cahiers du cinéma, sélections de certains festivals, listes personnelles... Elle permet d'explorer l'histoire du cinéma à travers ces regards, de découvrir des <span class="ctp-mauve">**familles de cinéastes**</span>, de recevoir des <span class="ctp-mauve">**recommandations personnalisées**</span> et d'être <span class="ctp-mauve">**conseillé en langage naturel sur tout le catalogue**</span>.
-
-<div class="split" markdown>
-
-<div class="split-media">
-<img src="assets/ui_cine.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;border: 1px solid var(--ctp-mauve);">
-</div>
-
-<div class="split-body" markdown>
-
-- Enrichissement automatisé de la base : IMDb, références cinéphiles
-- Exploration par cinéastes, régions, périodes, listes
-- Comparaison critiques et public
-- Profil cinéphile et recommandations à partir de films préférés
-- Conseils en langage naturel par un agent conversationnel, justifiés par les signaux
-
-</div>
-
-</div>
-
-*Lien vers l'application à venir*
-
-<details markdown>
-<summary><strong>Architecture de la solution</strong></summary>
-
-
-
-
-
-```mermaid
-%%{init: {
-  "theme": "base",
-  "themeVariables": {
-    "fontSize": "16px"
-  },
-  "themeCSS": ".node rect, .node polygon, .node path, .node circle, .node ellipse { fill: var(--ctp-base); stroke: var(--ctp-surface1); stroke-width: 1.5px; }\n.nodeLabel { color: var(--ctp-text); fill: var(--ctp-text); }\n.cluster rect { fill: var(--ctp-mantle); stroke: var(--ctp-surface1); stroke-width: 1px; rx: 10px; ry: 10px; }\n.cluster-label, .cluster .nodeLabel, .cluster span, .cluster text { color: var(--ctp-text); fill: var(--ctp-subtext0); }\n.edgePath .path, .flowchart-link { stroke: var(--ctp-overlay1); stroke-width: 1.5px; }\n.marker, .arrowheadPath { fill: var(--ctp-overlay1); stroke: var(--ctp-overlay1); }\n.edgeLabel { background-color: transparent !important; color: var(--ctp-text) !important; }\n.labelBkg, .edgeLabel .labelBkg, .edgeLabel .label rect, .edgeLabel rect { background-color: var(--ctp-mantle) !important; fill: var(--ctp-mantle) !important; }\n.edgeLabel .label, .edgeLabel span, .edgeLabel text, .edgeLabel p { background-color: var(--ctp-mantle) !important; color: var(--ctp-text) !important; fill: var(--ctp-text) !important; }",
-  "flowchart": {
-    "nodeSpacing": 40,
-    "rankSpacing": 50,
-    "htmlLabels": true,
-    "padding": 15,
-    "curve": "basis",
-    "subGraphTitleMargin": {"top": 20, "bottom": 20}
-  }
-}}%%
-flowchart LR
-    subgraph CONC["<b>Conception · Données & signaux</b>"]
-        direction TB
-        A[("<b>Sources</b><br/>IMDb · Wikidata · signaux cinéphiles")] --> B("<b>Ingestion & matching</b><br/>collecte · résolution en cascade · revue manuelle<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/dlt-4B4B8F?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pandera-2C5F8A?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        B --> C("<b>Entrepôt & transformations</b><br/>ref_* · stg_* · cœur métier<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/DuckDB-FFF000?style=for-the-badge&logo=duckdb&logoColor=black' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/dbt-FF694B?style=for-the-badge&logo=dbt&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        C --> D("<b>Orchestration</b><br/>assets · planification · contrôles qualité<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Dagster-4F43DD?style=for-the-badge&logo=dagster&logoColor=white' height='30' style='display:block;'/></div>")
-    end
-
-    subgraph DEPL["<b>Déploiement · Application & modèles</b>"]
-        direction TB
-        E("<b>Base cloud</b><br/>entrepôt partagé, même modèle de données<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MotherDuck-1B1B1B?style=for-the-badge&logoColor=white' height='30' style='display:block;'/></div>")
-        E --> F("<b>Application Streamlit</b><br/>exploration · profils · pondérations<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-        F --> G("<b>Familles & recommandations</b><br/>clustering des signaux · profil de goût<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block;'/></div>")
-        G --> H("<b>Agent conversationnel</b><br/>conseils fondés sur les films et les signaux<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Mistral%20AI-FA520F?style=for-the-badge&logo=mistralai&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic%20AI-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
-    end
-
-    CONC ==>|publication de la base| DEPL
-```
-Côté données, dlt collecte IMDb, Wikidata et les signaux cinéphiles, puis les cas ambigus sont résolus par une cascade de règles et une revue manuelle. dbt transforme ensuite les référentiels bruts et les zones de staging en un cœur métier où tous les signaux partagent le même modèle : un agent (critique, festival, cinéaste…) applique une valeur à un film ou à un cinéaste. Dagster orchestre l'ensemble et contrôle la qualité à chaque exécution.
-
-Côté application, l'entrepôt est publié sur MotherDuck et alimente l'interface Streamlit, qui permet d'explorer l'histoire du cinéma à travers ces regards. Un clustering des signaux dégage des familles de cinéastes, et la recommandation pondère les signaux selon le profil de l'utilisateur. Un agent conversationnel conseille des films en s'appuyant sur la base et sur ces signaux.
-
-Pour plus de détails, retrouvez la documentation technique (à venir) et le code (à venir) du projet.
-
-
-</details>
-
----
-
-## :lucide-wheat: &nbsp; Prévision agricole
+## :lucide-wheat: &nbsp; Prévision agricole {#agri}
 
 À destination des acteurs agricoles, cette application <span class="ctp-mauve">**prédit le rendement d'une culture**</span> et <span class="ctp-mauve">**classe les cultures les plus adaptées**</span> dans un contexte donné (zone, année, pluviométrie, pesticides, température). Entraîné sur des données de la *Food and Agriculture Organization* des années passées, le modèle prédit l'année suivante avec une très bonne précision.
 
@@ -93,8 +17,6 @@ Pour plus de détails, retrouvez la documentation technique (à venir) et le cod
 
 <div class="split-body" markdown>
 
-**Parcours utilisateur**
-
 - Choix de la zone, de la culture et de l'année
 - Réglage des conditions (pluviométrie, pesticides, température)
 - Prédiction du rendement de la culture sélectionnée
@@ -104,7 +26,7 @@ Pour plus de détails, retrouvez la documentation technique (à venir) et le cod
 
 </div>
 
-[*Lien vers l'application*](https://agri-ui-28873275232.europe-west1.run.app) (premier chargement lent)
+[*Lien vers l'application*](https://agri-ui-28873275232.europe-west1.run.app) (le premier chargement peut prendre quelques secondes)
 
 <details markdown>
 <summary><strong>Architecture de la solution</strong></summary>
@@ -157,7 +79,7 @@ Pour plus de détails, consultez la [documentation technique](https://olivierbin
 
 ---
 
-## :lucide-whistle: &nbsp; Assistant NBA
+## :lucide-whistle: &nbsp; Assistant NBA {#nba}
 À destination des passionnés de basket, cette application est un <span class="ctp-mauve">**chatbot Mistral enrichi de données externes**</span> (discussions Reddit de fans et tableaux Excel de statistiques) pour répondre à des <span class="ctp-mauve">**questions pointues sur la saison NBA**</span>. Une évaluation sur un jeu de questions de référence a permis de valider l'amélioration des réponses.
 
 
@@ -178,7 +100,7 @@ Pour plus de détails, consultez la [documentation technique](https://olivierbin
 
 </div>
 
-[*Lien vers l'application*](https://llmeval-nba.streamlit.app/) (mot de passe : `nbademo` / premier chargement lent)
+[*Lien vers l'application*](https://llmeval-nba.streamlit.app/) (mot de passe : `nbademo` / le premier chargement peut prendre quelques secondes)
 
 <details markdown>
 <summary><strong>Architecture de la solution</strong></summary>
@@ -233,7 +155,7 @@ Pour plus de détails, consultez la [documentation technique](https://olivierbin
 
 ---
 
-## :lucide-piggy-bank: &nbsp; Scoring crédit
+## :lucide-piggy-bank: &nbsp; Scoring crédit {#credit}
 
 
 À destination d'organismes de crédit, cette application prédit le <span class="ctp-mauve">**risque de défaut d'un demandeur**</span> à l'aide d'un modèle de Machine Learning entraîné sur l'historique de clients ayant honoré ou non leurs remboursements.
@@ -257,7 +179,7 @@ Pour plus de détails, consultez la [documentation technique](https://olivierbin
 
 </div>
 
-[*Lien vers l'application*](https://huggingface.co/spaces/OlivierBinder/credit-scoring) (premier chargement lent)
+[*Lien vers l'application*](https://huggingface.co/spaces/OlivierBinder/credit-scoring) (le premier chargement peut prendre quelques secondes)
 
 <details markdown>
 <summary><strong>Architecture de la solution</strong></summary>
@@ -314,3 +236,78 @@ Pour plus de détails, retrouvez la [documentation technique](https://olivierbin
 
 </details>
 
+
+---
+
+## :lucide-clapperboard: &nbsp; Suggestion de films {#cine}
+
+Cette application enrichit la base de référence <span class="ctp-mauve">**IMDb**</span> du box-office français et de <span class="ctp-mauve">**références cinéphiles soigneusement sélectionnées**</span> : notes des Cahiers du cinéma, sélections de certains festivals, listes personnelles... Elle permet d'explorer l'histoire du cinéma à travers ces regards, de découvrir des <span class="ctp-mauve">**familles de cinéastes**</span>, de recevoir des <span class="ctp-mauve">**recommandations personnalisées**</span> et d'être <span class="ctp-mauve">**conseillé en langage naturel sur tout le catalogue**</span>.
+
+<div class="split" markdown>
+
+<div class="split-media">
+<img src="assets/ui_cine.jpg" alt="Interface utilisateur" style="width: 100%; border-radius: 12px;border: 1px solid var(--ctp-mauve);">
+</div>
+
+<div class="split-body" markdown>
+
+- Enrichissement automatisé  : IMDb, listes
+- Exploration par cinéastes, régions, périodes
+- Recommandations à partir de films préférés
+- Chatbot cinéphile
+
+</div>
+
+</div>
+
+*Lien vers l'application à venir*
+
+<details markdown>
+<summary><strong>Architecture de la solution</strong></summary>
+
+
+
+
+
+```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontSize": "16px"
+  },
+  "themeCSS": ".node rect, .node polygon, .node path, .node circle, .node ellipse { fill: var(--ctp-base); stroke: var(--ctp-surface1); stroke-width: 1.5px; }\n.nodeLabel { color: var(--ctp-text); fill: var(--ctp-text); }\n.cluster rect { fill: var(--ctp-mantle); stroke: var(--ctp-surface1); stroke-width: 1px; rx: 10px; ry: 10px; }\n.cluster-label, .cluster .nodeLabel, .cluster span, .cluster text { color: var(--ctp-text); fill: var(--ctp-subtext0); }\n.edgePath .path, .flowchart-link { stroke: var(--ctp-overlay1); stroke-width: 1.5px; }\n.marker, .arrowheadPath { fill: var(--ctp-overlay1); stroke: var(--ctp-overlay1); }\n.edgeLabel { background-color: transparent !important; color: var(--ctp-text) !important; }\n.labelBkg, .edgeLabel .labelBkg, .edgeLabel .label rect, .edgeLabel rect { background-color: var(--ctp-mantle) !important; fill: var(--ctp-mantle) !important; }\n.edgeLabel .label, .edgeLabel span, .edgeLabel text, .edgeLabel p { background-color: var(--ctp-mantle) !important; color: var(--ctp-text) !important; fill: var(--ctp-text) !important; }",
+  "flowchart": {
+    "nodeSpacing": 40,
+    "rankSpacing": 50,
+    "htmlLabels": true,
+    "padding": 15,
+    "curve": "basis",
+    "subGraphTitleMargin": {"top": 20, "bottom": 20}
+  }
+}}%%
+flowchart LR
+    subgraph CONC["<b>Conception · Données & signaux</b>"]
+        direction TB
+        A[("<b>Sources</b><br/>IMDb · Wikidata · signaux cinéphiles")] --> B("<b>Ingestion & matching</b><br/>collecte · résolution en cascade · revue manuelle<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/dlt-4B4B8F?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/pandera-2C5F8A?style=for-the-badge&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        B --> C("<b>Entrepôt & transformations</b><br/>ref_* · stg_* · cœur métier<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/DuckDB-FFF000?style=for-the-badge&logo=duckdb&logoColor=black' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/dbt-FF694B?style=for-the-badge&logo=dbt&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        C --> D("<b>Orchestration</b><br/>assets · planification · contrôles qualité<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Dagster-4F43DD?style=for-the-badge&logo=dagster&logoColor=white' height='30' style='display:block;'/></div>")
+    end
+
+    subgraph DEPL["<b>Déploiement · Application & modèles</b>"]
+        direction TB
+        E("<b>Base cloud</b><br/>entrepôt partagé, même modèle de données<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/MotherDuck-1B1B1B?style=for-the-badge&logoColor=white' height='30' style='display:block;'/></div>")
+        E --> F("<b>Application Streamlit</b><br/>exploration · profils · pondérations<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+        F --> G("<b>Familles & recommandations</b><br/>clustering des signaux · profil de goût<br/><div style='width:fit-content; margin:6px auto 0; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white' height='30' style='display:block;'/></div>")
+        G --> H("<b>Agent conversationnel</b><br/>conseils fondés sur les films et les signaux<br/><div style='display:flex; gap:6px; justify-content:center; width:250px; margin:6px auto 0;'><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Mistral%20AI-FA520F?style=for-the-badge&logo=mistralai&logoColor=white' height='30' style='display:block; max-width:none;'/></div><div style='flex:none; border-radius:4px; overflow:hidden;'><img src='https://img.shields.io/badge/Pydantic%20AI-E92063?style=for-the-badge&logo=pydantic&logoColor=white' height='30' style='display:block; max-width:none;'/></div></div>")
+    end
+
+    CONC ==>|publication de la base| DEPL
+```
+Côté données, dlt collecte IMDb, Wikidata et les signaux cinéphiles, puis les cas ambigus sont résolus par une cascade de règles et une revue manuelle. dbt transforme ensuite les référentiels bruts et les zones de staging en un cœur métier où tous les signaux partagent le même modèle : un agent (critique, festival, cinéaste…) applique une valeur à un film ou à un cinéaste. Dagster orchestre l'ensemble et contrôle la qualité à chaque exécution.
+
+Côté application, l'entrepôt est publié sur MotherDuck et alimente l'interface Streamlit, qui permet d'explorer l'histoire du cinéma à travers ces regards. Un clustering des signaux dégage des familles de cinéastes, et la recommandation pondère les signaux selon le profil de l'utilisateur. Un agent conversationnel conseille des films en s'appuyant sur la base et sur ces signaux.
+
+Pour plus de détails, retrouvez la documentation technique (à venir) et le code (à venir) du projet.
+
+
+</details>

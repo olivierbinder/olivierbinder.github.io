@@ -1,0 +1,11 @@
+{
+    "duckdb.databases": [
+        {
+            "alias": "cine",
+            "type": "file",
+            "path": "./data/warehouse/cine.duckdb",
+            "readOnly": true,
+            "attached": false
+        }
+    ]
+}

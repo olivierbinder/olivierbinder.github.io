@@ -27,15 +27,15 @@ Retrouvez le détail dans mes *[projets](02_projects.md)* et mes *[compétences 
 Missions de trois mois à deux ans pour des <span class="ctp-mauve">**directions générales et métiers, de l’identification des besoins à l’accompagnement des équipes**</span> au sein du cabinet *[Added Value Consulting](https://www.adv-paris.com/)*  (Paris et Luxembourg, 2012-2014 / 2020-2025)
 
 
-- **Thales** : transformation d'un service clientèle international. **Data** : analyse textuelle d'emails et de questionnaires pour catégoriser et dimensionner les demandes clients *(+ résultat)*.
-- **Saur** : optimisation des opérations. **Data** : analyse des données d'intervention et de maintenance pour construire le business case *(+ gain estimé)*.
-- **KPMG** : réorganisation des services supports d'un bureau. Plus de 100 entretiens pour cerner les besoins, puis conception, lancement et suivi des actions d'amélioration avec les équipes *(+ résultat)*.
+- **Thales** : transformation d'un service clientèle international. *Partie data NLTK* : analyse textuelle d'emails pour catégoriser et dimensionner les demandes clients.
+- **Saur** : optimisation des opérations. *Partie data Pandas* : analyse des données d'intervention et de maintenance pour construire le business case.
+- **KPMG** : réorganisation des services supports d'un bureau. Plus de 100 entretiens pour cerner les besoins, puis conception, lancement et suivi des actions d'amélioration avec les équipes.
 - **Lyonnaise des Eaux** : pilotage d'un programme (plus de 70 personnes, employés et prestataires) pour le nouveau système de facturation (5 M de clients, 2 Md€ de chiffre d'affaires).
-- **Endel** : accompagnement à l'innovation selon la Blue Ocean Strategy. Ateliers de réflexion, conception et lancement d'un portefeuille de projets innovants *(+ nombre)*.
+- **Endel** : accompagnement à l'innovation selon la Blue Ocean Strategy. Ateliers de réflexion, conception et lancement d'un portefeuille de projets innovants.
 
 Mission de conseil en Systèmes d'information au sein du cabinet **Accenture** (Paris, 2011-2012)
 
-- **Carrefour** (Accenture) : outil numérique contre les ruptures et les sur-stocks. Conception du produit avec les équipes clientes, puis développement avec une équipe offshore *(SQL)*.
+- **Carrefour** : outil numérique contre les ruptures et les sur-stocks. Conception du produit avec les équipes clientes, puis développement avec une équipe offshore *(SQL)*.
 
 
 ---
@@ -53,7 +53,7 @@ Mission de conseil en Systèmes d'information au sein du cabinet **Accenture** (
 ## Compétences
 
 - **Informatique pour la science des données** — voir *[compétences techniques](03_stack.md)*
-- **Gestion de projet** — méthode Agile
+- **Gestion de projet** — classique et agile
 - **Anglais courant** — TOEIC 900/990
 
 ---
